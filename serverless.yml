@@ -19,7 +19,7 @@ service: show-me-a-story
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
 
 # you can overwrite defaults here
   stage: dev
@@ -55,8 +55,10 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  logger:
-    handler: handler.logger
+  endIntent:
+    handler: handler.endIntent
+  evaluateInput:
+    handler: handler.evaluateInput
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

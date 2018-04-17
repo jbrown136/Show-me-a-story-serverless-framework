@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports.logger = (event, context, callback) => {
+module.exports.endIntent = (event, context, callback) => {
   const response = {
     dialogAction: {
       type: "Close",
@@ -13,9 +13,32 @@ module.exports.logger = (event, context, callback) => {
   };
   console.log(event.currentIntent.slots);
   callback(null, response);
+};
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+module.exports.evaluateInput = (event, context, callback) => {
+  const { slots } = event.currentIntent;
+  const response = {
+    sessionAttributes: event.sessionAttributes,
+    dialogAction: {
+      type: "Delegate",
+      slots
+    }
+  };
+
+  // let result = "";
+  // for (let key in slots) {
+  //   if (slots[key] === event.inputTranscript) {
+  //     result = key;
+  //   }
+  // }
+
+  const result = Object.entries(slots).reduce((acc, curr) => {
+    if (curr[1] === event.inputTranscript) return curr[0];
+    return acc;
+  }, "");
+
+  console.log(result);
+  callback(null, response);
 };
 
 // {
