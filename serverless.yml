@@ -91,10 +91,10 @@ functions:
 #          trigger: PreSignUp
 
 #    Define function environment variables here
-   environment:
-     serviceAccount: ${file(../config):serviceAccount}
-     databaseURL: ${file(../config):databaseURL}
-     imageSearch: ${file(../config):imageSearch}
+  environment:
+    serviceAccount: ${file(../config):serviceAccount}
+    databaseURL: ${file(../config):databaseURL}
+    imageSearch: ${file(../config):imageSearch}
 
 # you can add CloudFormation resource templates here
 #resources:
