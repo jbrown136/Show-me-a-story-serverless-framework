@@ -1,7 +1,6 @@
 "use strict";
 const fetch = require("node-fetch");
-const { firebaseKeys, imageSearch } =
-  require("process.env") || require("./config");
+const { firebaseKeys, imageSearch } = require("./config");
 
 module.exports.endIntent = (event, context, callback) => {
   const response = {
@@ -27,13 +26,6 @@ module.exports.evaluateInput = (event, context, callback) => {
       slots
     }
   };
-
-  // let result = "";
-  // for (let key in slots) {
-  //   if (slots[key] === event.inputTranscript) {
-  //     result = key;
-  //   }
-  // }
 
   const currentSlot = Object.entries(slots).reduce((acc, curr) => {
     if (curr[1] === event.inputTranscript) return curr[0];
