@@ -46,19 +46,20 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
+package:
+  include:
+    - handler.js
+  exclude:
+    - node_modules/**
+    - '!node_modules/node-fetch/**'
 
 functions:
   endIntent:
     handler: handler.endIntent
   evaluateInput:
     handler: handler.evaluateInput
+  fetchAndSendImage:
+    handler: handler.fetchAndSendImage
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
