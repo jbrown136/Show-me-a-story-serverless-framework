@@ -1,6 +1,7 @@
 "use strict";
 const fetch = require("node-fetch");
-const { firebaseKeys, imageSearch } = require("./config");
+const admin = require("firebase-admin");
+const { serviceAccount, databaseURL, imageSearch } = process.env;
 
 module.exports.endIntent = (event, context, callback) => {
   const response = {
@@ -32,20 +33,33 @@ module.exports.evaluateInput = (event, context, callback) => {
     return acc;
   }, "");
 
-  fetchAndSendImage(currentSlot, event.inputTranscript);
+  fetchLocationAndSendImage(currentSlot, event.inputTranscript);
   callback(null, response);
 };
 
-function fetchAndSendImage(slot, text) {
+function fetchLocationAndSendImage(text) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: serviceAccount.databaseURL
+  });
+
+  const db = admin.firestore();
+
+  const docRef = db.collection("session").doc("test");
+
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageSearch.apiKey}&cx=${
       imageSearch.customSearchURL
     }&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
-    .then(imgObj =>
-      console.log(JSON.stringify({ text, imageUrl: imgObj.items[0].link }))
-    )
+    .then(imgObj => {
+      const dbPayload = {
+        sdljbfsd: { url: imgObj.items[0].link, value: text }
+      };
+      const setTest = docRef.update(dbPayload);
+      console.log(JSON.stringify(dbPayload));
+    })
     .catch(console.log);
 }
 

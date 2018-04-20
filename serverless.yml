@@ -46,12 +46,12 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-package:
-  include:
-    - handler.js
-  exclude:
-    - node_modules/**
-    - '!node_modules/node-fetch/**'
+# package:
+#   include:
+#     - handler.js
+#   exclude:
+#     - node_modules/**
+#     - '!node_modules/node-fetch/**'
 
 functions:
   endIntent:
@@ -91,8 +91,10 @@ functions:
 #          trigger: PreSignUp
 
 #    Define function environment variables here
-#    environment:
-#      variable2: value2
+   environment:
+     serviceAccount: ${file(../config):serviceAccount}
+     databaseURL: ${file(../config):databaseURL}
+     imageSearch: ${file(../config):imageSearch}
 
 # you can add CloudFormation resource templates here
 #resources:
