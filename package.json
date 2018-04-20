@@ -1,0 +1,24 @@
+{
+  "name": "Show-me-a-story-serverless-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbrown136/Show-me-a-story-serverless-framework.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jbrown136/Show-me-a-story-serverless-framework/issues"
+  },
+  "homepage": "https://github.com/jbrown136/Show-me-a-story-serverless-framework#readme",
+  "dependencies": {
+    "firebase-admin": "^5.12.0",
+    "node-fetch": "^2.1.2"
+  }
+}
