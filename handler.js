@@ -53,23 +53,26 @@ module.exports.evaluateInput = (event, context, callback) => {
     return acc;
   }, "");
 
-  fetchLocationAndSendImage(event.inputTranscript);
+  console.log(currentSlot);
+
+  switch (currentSlot) {
+    case "location":
+      fetchLocationAndSendImage(event.inputTranscript);
+      break;
+    case "weather":
+      console.log("this is some weather css");
+      break;
+    case "mainCharacter":
+      fetchMainCharacterAndSendImage(event.inputTranscript);
+      break;
+  }
+
+  // fetchLocationAndSendImage(event.inputTranscript);
   callback(null, response);
 };
 
 function fetchLocationAndSendImage(text) {
-  // const config = {
-  //   apiKey,
-  //   authDomain,
-  //   projectId
-  // };
-  // const defaultApp = firebase.initializeApp(config);
-
-  // const db = firebase.firestore();
-  console.log(text);
-
   const docRef = db.collection("session").doc("test");
-
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
@@ -78,11 +81,26 @@ function fetchLocationAndSendImage(text) {
       const dbPayload = {
         location: { url: imgObj.items[0].link, value: text }
       };
-      console.log(dbPayload);
       const setTest = docRef.update(dbPayload);
     })
     .catch(console.log);
 }
+
+function fetchMainCharacterAndSendImage(text) {
+  const docRef = db.collection("session").doc("test");
+  return fetch(
+    `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
+  )
+    .then(res => res.json())
+    .then(imgObj => {
+      const dbPayload = {
+        mainCharacter: [{ url: imgObj.items[0].link }]
+      };
+      const setTest = docRef.update(dbPayload);
+    })
+    .catch(console.log);
+}
+
 // {
 //   "currentIntent": {
 //     "name": "intent-name",
