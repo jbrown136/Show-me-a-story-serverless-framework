@@ -53,8 +53,6 @@ module.exports.evaluateInput = (event, context, callback) => {
     return acc;
   }, "");
 
-  console.log(currentSlot);
-
   switch (currentSlot) {
     case "location":
       fetchLocationAndSendImage(event.inputTranscript);
@@ -63,11 +61,10 @@ module.exports.evaluateInput = (event, context, callback) => {
       console.log("this is some weather css");
       break;
     case "mainCharacter":
-      fetchMainCharacterAndSendImage(event.inputTranscript);
+      fetchCharacterAndSendImage(event, event.inputTranscript);
       break;
   }
 
-  // fetchLocationAndSendImage(event.inputTranscript);
   callback(null, response);
 };
 
@@ -86,17 +83,20 @@ function fetchLocationAndSendImage(text) {
     .catch(console.log);
 }
 
-function fetchMainCharacterAndSendImage(text) {
+function fetchCharacterAndSendImage(event, text) {
   const docRef = db.collection("session").doc("test");
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
     .then(imgObj => {
-      const dbPayload = {
-        mainCharacter: [{ url: imgObj.items[0].link }]
-      };
-      const setTest = docRef.update(dbPayload);
+      console.log(event.sessionAttributes);
+      const nameKey = event.currentIntent.slots.mainCharacterName;
+      const characters = {};
+      characters[nameKey] = imgObj.items[0].link;
+      const dbPayload = { characters };
+
+      const setTest = docRef.set(dbPayload, { merge: true });
     })
     .catch(console.log);
 }
