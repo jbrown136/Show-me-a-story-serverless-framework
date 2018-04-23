@@ -21,12 +21,12 @@ provider:
   name: aws
   runtime: nodejs8.10
   environment:
-    apiKey: ${file(./config.json):apiKey}
     authDomain: ${file(./config.json):authDomain}
-    databaseURL: ${file(./config.json):databaseURL}
     projectId: ${file(./config.json):projectId}
     imageKey: ${file(./config.json):imageKey}
     customSearchURL: ${file(./config.json):customSearchURL}
+    clientEmail: ${file(./config.json):clientEmail}
+    privateKey: ${file(./config.json):privateKey}
 
 # you can overwrite defaults here
   stage: dev

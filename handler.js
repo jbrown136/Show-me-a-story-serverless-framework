@@ -1,15 +1,28 @@
 "use strict";
 const fetch = require("node-fetch");
-const firebase = require("firebase");
-require("firebase/firestore");
+const admin = require("firebase-admin");
 const {
-  apiKey,
+  privateKey,
   authDomain,
-  databaseURL,
   projectId,
   imageKey,
-  customSearchURL
+  customSearchURL,
+  clientEmail
 } = process.env;
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId,
+    clientEmail,
+    privateKey: `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----\n`.replace(
+      /\\n/g,
+      "\n"
+    )
+  }),
+  databaseURL: authDomain
+});
+
+const db = admin.firestore();
 
 module.exports.endIntent = (event, context, callback) => {
   const response = {
@@ -45,16 +58,15 @@ module.exports.evaluateInput = (event, context, callback) => {
 };
 
 function fetchLocationAndSendImage(text) {
+  // const config = {
+  //   apiKey,
+  //   authDomain,
+  //   projectId
+  // };
+  // const defaultApp = firebase.initializeApp(config);
+
+  // const db = firebase.firestore();
   console.log(text);
-
-  const config = {
-    apiKey,
-    authDomain,
-    projectId
-  };
-  const defaultApp = firebase.initializeApp(config);
-
-  const db = firebase.firestore();
 
   const docRef = db.collection("session").doc("test");
 
@@ -66,6 +78,7 @@ function fetchLocationAndSendImage(text) {
       const dbPayload = {
         location: { url: imgObj.items[0].link, value: text }
       };
+      console.log(dbPayload);
       const setTest = docRef.update(dbPayload);
     })
     .catch(console.log);
