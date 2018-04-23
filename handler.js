@@ -58,7 +58,7 @@ module.exports.evaluateInput = (event, context, callback) => {
       fetchLocationAndSendImage(event.inputTranscript);
       break;
     case "weather":
-      console.log("this is some weather css");
+      sendWeatherToDatabase(event.inputTranscript);
       break;
     case "mainCharacter":
       fetchCharacterAndSendImage(event, event.inputTranscript);
@@ -99,6 +99,79 @@ function fetchCharacterAndSendImage(event, text) {
       const setTest = docRef.set(dbPayload, { merge: true });
     })
     .catch(console.log);
+}
+
+function sendWeatherToDatabase(text) {
+  const lookup = {
+    storm: "storm",
+    lightning: "storm",
+    thunder: "storm",
+    thunderstorm: "storm",
+    fog: "fog",
+    mist: "fog",
+    misty: "fog",
+    foggy: "fog",
+    dew: "fog",
+    smog: "fog",
+    steam: "fog",
+    tornado: "tornado",
+    whirlwind: "tornado",
+    cyclone: "tornado",
+    twister: "tornado",
+    typhoon: "tornado",
+    blizzard: "blizzard",
+    snowstorm: "blizzard",
+    snowstorms: "blizzard",
+    snowstorming: "blizzard",
+    whiteout: "blizzard",
+    ice: "ice",
+    icey: "ice",
+    freezing: "ice",
+    frozen: "ice",
+    chilly: "ice",
+    cold: "ice",
+    sun: "sun",
+    sunny: "sun",
+    summery: "sun",
+    hot: "sun",
+    warm: "sun",
+    hail: "hail",
+    hailstone: "hail",
+    hailstones: "hail",
+    wind: "wind",
+    windy: "wind",
+    blustery: "wind",
+    windswept: "wind",
+    gusty: "wind",
+    brisk: "wind",
+    blowing: "wind",
+    rain: "rain",
+    rainy: "rain",
+    drizzle: "rain",
+    drizzly: "rain",
+    showers: "rain",
+    wet: "rain",
+    cloud: "cloud",
+    cloudy: "cloud",
+    overcast: "cloud",
+    gloomy: "cloud",
+    murky: "cloud",
+    dull: "cloud",
+    grey: "cloud",
+    rainbow: "rainbow",
+    sleet: "sleet",
+    sandstorm: "sandstorm",
+    sandstorms: "sandstorm",
+    sandstormy: "sandstorm",
+    snow: "snow",
+    snowy: "snow",
+    winter: "snow",
+    wintery: "snow"
+  };
+  const weather = lookup[text] ? lookup[text] : "";
+  const docRef = db.collection("session").doc("test");
+  const setWeather = docRef.set({ weather });
+  return "";
 }
 
 // {
