@@ -20,6 +20,13 @@ service: show-me-a-story
 provider:
   name: aws
   runtime: nodejs8.10
+  environment:
+    apiKey: ${file(./config.json):apiKey}
+    authDomain: ${file(./config.json):authDomain}
+    databaseURL: ${file(./config.json):databaseURL}
+    projectId: ${file(./config.json):projectId}
+    imageKey: ${file(./config.json):imageKey}
+    customSearchURL: ${file(./config.json):customSearchURL}
 
 # you can overwrite defaults here
   stage: dev
@@ -58,8 +65,6 @@ functions:
     handler: handler.endIntent
   evaluateInput:
     handler: handler.evaluateInput
-  fetchAndSendImage:
-    handler: handler.fetchAndSendImage
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -91,10 +96,8 @@ functions:
 #          trigger: PreSignUp
 
 #    Define function environment variables here
-  environment:
-    serviceAccount: ${file(../config):serviceAccount}
-    databaseURL: ${file(../config):databaseURL}
-    imageSearch: ${file(../config):imageSearch}
+#    environment:
+
 
 # you can add CloudFormation resource templates here
 #resources:

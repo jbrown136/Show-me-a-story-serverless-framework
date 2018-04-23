@@ -1,7 +1,15 @@
 "use strict";
 const fetch = require("node-fetch");
-const admin = require("firebase-admin");
-const { serviceAccount, databaseURL, imageSearch } = process.env;
+const firebase = require("firebase");
+require("firebase/firestore");
+const {
+  apiKey,
+  authDomain,
+  databaseURL,
+  projectId,
+  imageKey,
+  customSearchURL
+} = process.env;
 
 module.exports.endIntent = (event, context, callback) => {
   const response = {
@@ -14,7 +22,6 @@ module.exports.endIntent = (event, context, callback) => {
       }
     }
   };
-  console.log(event.currentIntent.slots);
   callback(null, response);
 };
 
@@ -33,36 +40,36 @@ module.exports.evaluateInput = (event, context, callback) => {
     return acc;
   }, "");
 
-  fetchLocationAndSendImage(currentSlot, event.inputTranscript);
+  fetchLocationAndSendImage(event.inputTranscript);
   callback(null, response);
 };
 
 function fetchLocationAndSendImage(text) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: serviceAccount.databaseURL
-  });
+  console.log(text);
 
-  const db = admin.firestore();
+  const config = {
+    apiKey,
+    authDomain,
+    projectId
+  };
+  const defaultApp = firebase.initializeApp(config);
+
+  const db = firebase.firestore();
 
   const docRef = db.collection("session").doc("test");
 
   return fetch(
-    `https://www.googleapis.com/customsearch/v1?key=${imageSearch.apiKey}&cx=${
-      imageSearch.customSearchURL
-    }&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
+    `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
     .then(imgObj => {
       const dbPayload = {
-        sdljbfsd: { url: imgObj.items[0].link, value: text }
+        location: { url: imgObj.items[0].link, value: text }
       };
       const setTest = docRef.update(dbPayload);
-      console.log(JSON.stringify(dbPayload));
     })
     .catch(console.log);
 }
-
 // {
 //   "currentIntent": {
 //     "name": "intent-name",
