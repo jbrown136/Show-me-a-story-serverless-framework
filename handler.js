@@ -78,7 +78,7 @@ function fetchLocationAndSendImage(text) {
       const dbPayload = {
         location: { url: imgObj.items[0].link, value: text }
       };
-      const setTest = docRef.update(dbPayload);
+      const setTest = docRef.set(dbPayload, { merge: true });
     })
     .catch(console.log);
 }
@@ -170,7 +170,7 @@ function sendWeatherToDatabase(text) {
   };
   const weather = lookup[text] ? lookup[text] : "";
   const docRef = db.collection("session").doc("test");
-  const setWeather = docRef.set({ weather });
+  const setWeather = docRef.set({ weather }, { merge: true });
   return "";
 }
 
