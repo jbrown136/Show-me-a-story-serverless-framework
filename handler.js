@@ -39,7 +39,6 @@ module.exports.endIntent = (event, context, callback) => {
 };
 
 module.exports.evaluateInput = (event, context, callback) => {
-  console.log({ userId: event.userId });
   const { slots } = event.currentIntent;
   const response = {
     sessionAttributes: event.sessionAttributes,
@@ -92,14 +91,15 @@ function fetchCharacterAndSendImage(event, docRef, text) {
     .then(res => res.json())
     .then(imgObj => {
       const nameKey = event.currentIntent.slots.mainCharacterName;
-      console.log({ nameKey });
-      console.log({ url: imgObj.items[0].link });
-      const characters = {};
-      characters[nameKey] = imgObj.items[0].link;
-      const dbPayload = { characters };
-
-      console.log({ dbPayload });
-      const setCharacter = docRef.update(dbPayload);
+      const newCharacter = {};
+      newCharacter[nameKey] = imgObj.items[0].link;
+      db.runTransaction(t => {
+        return t.get(docRef).then(doc => {
+          const oldCharacters = doc.data().characters;
+          const updatedCharacters = { ...oldCharacters, ...newCharacter };
+          t.update(docRef, { characters: updatedCharacters });
+        });
+      });
     })
     .catch(console.log);
 }
@@ -174,7 +174,6 @@ function sendWeatherToDatabase(docRef, text) {
   };
   const weather = lookup[text] ? lookup[text] : "";
   const setWeather = docRef.update({ weather });
-  return "";
 }
 
 // {
