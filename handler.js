@@ -48,8 +48,12 @@ module.exports.evaluateInput = (event, context, callback) => {
     }
   };
 
-  const currentSlot = Object.entries(slots).reduce((acc, curr) => {
-    if (curr[1] === event.inputTranscript) return curr[0];
+  const currentSlot = Object.entries(slots).reduce((acc, slot) => {
+    console.log({ slot1: slot[1] });
+    console.log({ slot });
+    if (!slot[1]) return acc;
+    if (slot[1].toLowerCase() === event.inputTranscript.toLowerCase())
+      return slot[0];
     return acc;
   }, "");
 
