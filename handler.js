@@ -39,6 +39,7 @@ module.exports.endIntent = (event, context, callback) => {
 };
 
 module.exports.evaluateInput = (event, context, callback) => {
+  console.log({ userId: event.userId });
   const { slots } = event.currentIntent;
   const response = {
     sessionAttributes: event.sessionAttributes,
@@ -53,23 +54,24 @@ module.exports.evaluateInput = (event, context, callback) => {
     return acc;
   }, "");
 
+  const docRef = db.collection("session").doc(event.userId);
+
   switch (currentSlot) {
     case "location":
-      fetchLocationAndSendImage(event.inputTranscript);
+      fetchLocationAndSendImage(docRef, event.inputTranscript);
       break;
     case "weather":
-      sendWeatherToDatabase(event.inputTranscript);
+      sendWeatherToDatabase(docRef, event.inputTranscript);
       break;
     case "mainCharacter":
-      fetchCharacterAndSendImage(event, event.inputTranscript);
+      fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
       break;
   }
 
   callback(null, response);
 };
 
-function fetchLocationAndSendImage(text) {
-  const docRef = db.collection("session").doc("scene1");
+function fetchLocationAndSendImage(docRef, text) {
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
@@ -78,31 +80,34 @@ function fetchLocationAndSendImage(text) {
       const dbPayload = {
         location: { url: imgObj.items[0].link, value: text }
       };
-      const setLocation = docRef.update(dbPayload);
+      const setLocation = docRef.set(dbPayload);
     })
     .catch(console.log);
 }
 
-function fetchCharacterAndSendImage(event, text) {
-  const docRef = db.collection("session").doc("scene1");
+function fetchCharacterAndSendImage(event, docRef, text) {
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
     .then(imgObj => {
       const nameKey = event.currentIntent.slots.mainCharacterName;
+      console.log({ nameKey });
+      console.log({ url: imgObj.items[0].link });
       const characters = {};
       characters[nameKey] = imgObj.items[0].link;
       const dbPayload = { characters };
 
+      console.log({ dbPayload });
       const setCharacter = docRef.update(dbPayload);
     })
     .catch(console.log);
 }
 
-function sendWeatherToDatabase(text) {
+function sendWeatherToDatabase(docRef, text) {
   const lookup = {
     storm: "storm",
+    stormy: "storm",
     lightning: "storm",
     thunder: "storm",
     thunderstorm: "storm",
@@ -168,8 +173,7 @@ function sendWeatherToDatabase(text) {
     wintery: "snow"
   };
   const weather = lookup[text] ? lookup[text] : "";
-  const docRef = db.collection("session").doc("scene1");
-  const setWeather = docRef.set({ weather });
+  const setWeather = docRef.update({ weather });
   return "";
 }
 
