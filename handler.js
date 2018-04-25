@@ -25,6 +25,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 module.exports.endIntent = (event, context, callback) => {
+  console.log({ event });
   const response = {
     dialogAction: {
       type: "Close",
@@ -50,15 +51,12 @@ module.exports.evaluateInput = (event, context, callback) => {
 
   const currentSlot = Object.entries(slots).reduce((acc, slot) => {
     if (!slot[1]) return acc;
-    if (
-      event.inputTranscript
-        .toLowerCase()
-        .split(" ")
-        .includes(slot[1].toLowerCase())
-    )
+    if (slot[1].toLowerCase() === event.inputTranscript.toLowerCase())
       return slot[0];
     return acc;
   }, "");
+
+  console.log({ currentSlot });
 
   const docRef = db.collection("session").doc(event.userId);
 
@@ -73,6 +71,14 @@ module.exports.evaluateInput = (event, context, callback) => {
       fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
       break;
   }
+
+  // if (slotDetails.mainCharacter.resolutions.length) {
+  //   fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
+  // } else if (slotDetails.weather.resolutions.length) {
+  //   sendWeatherToDatabase(docRef, event.inputTranscript);
+  // } else if (slotDetails.location.resolutions.length) {
+  //   fetchLocationAndSendImage(docRef, event.inputTranscript);
+  // }
 
   callback(null, response);
 };
