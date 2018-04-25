@@ -25,7 +25,16 @@ admin.initializeApp({
 const db = admin.firestore();
 
 module.exports.endIntent = (event, context, callback) => {
-  console.log({ event });
+  console.log(event.userId);
+  const { add, prop } = event.currentIntent.slots;
+  if (add === "character") {
+    const docRef = db.collection("session").doc(event.userId);
+    fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
+  } else if (add === "prop") {
+    const docRef = db.collection("session").doc(event.userId);
+    fetchPropAndSendImage(event, docRef, event.inputTranscript);
+  }
+
   const response = {
     dialogAction: {
       type: "Close",
@@ -40,6 +49,7 @@ module.exports.endIntent = (event, context, callback) => {
 };
 
 module.exports.evaluateInput = (event, context, callback) => {
+  console.log(event.userId);
   const { slots } = event.currentIntent;
   const response = {
     sessionAttributes: event.sessionAttributes,
@@ -51,7 +61,13 @@ module.exports.evaluateInput = (event, context, callback) => {
 
   const currentSlot = Object.entries(slots).reduce((acc, slot) => {
     if (!slot[1]) return acc;
-    if (slot[1].toLowerCase() === event.inputTranscript.toLowerCase())
+    if (
+      slot[1].toLowerCase() === event.inputTranscript.toLowerCase() ||
+      event.inputTranscript
+        .toLowerCase()
+        .split(" ")
+        .includes(slot[1].toLowerCase())
+    )
       return slot[0];
     return acc;
   }, "");
@@ -82,6 +98,27 @@ module.exports.evaluateInput = (event, context, callback) => {
 
   callback(null, response);
 };
+
+function fetchPropAndSendImage(event, docRef, text) {
+  console.log("fetch prop called");
+  return fetch(
+    `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
+  )
+    .then(res => res.json())
+    .then(imgObj => {
+      const nameKey = event.currentIntent.slots.prop;
+      const newProp = {};
+      newProp[nameKey] = imgObj.items[0].link;
+      db.runTransaction(t => {
+        return t.get(docRef).then(doc => {
+          const oldProps = doc.data().things;
+          const updatedProps = { ...oldProps, ...newProp };
+          t.update(docRef, { things: updatedProps });
+        });
+      });
+    })
+    .catch(console.log);
+}
 
 function fetchLocationAndSendImage(docRef, text) {
   console.log("fetch location called");
