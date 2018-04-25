@@ -49,10 +49,13 @@ module.exports.evaluateInput = (event, context, callback) => {
   };
 
   const currentSlot = Object.entries(slots).reduce((acc, slot) => {
-    console.log({ slot1: slot[1] });
-    console.log({ slot });
     if (!slot[1]) return acc;
-    if (slot[1].toLowerCase() === event.inputTranscript.toLowerCase())
+    if (
+      event.inputTranscript
+        .toLowerCase()
+        .split(" ")
+        .includes(slot[1].toLowerCase())
+    )
       return slot[0];
     return acc;
   }, "");
@@ -75,6 +78,7 @@ module.exports.evaluateInput = (event, context, callback) => {
 };
 
 function fetchLocationAndSendImage(docRef, text) {
+  console.log("fetch location called");
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text}&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
@@ -89,6 +93,7 @@ function fetchLocationAndSendImage(docRef, text) {
 }
 
 function fetchCharacterAndSendImage(event, docRef, text) {
+  console.log("fetch character called");
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
@@ -109,6 +114,7 @@ function fetchCharacterAndSendImage(event, docRef, text) {
 }
 
 function sendWeatherToDatabase(docRef, text) {
+  console.log("weather called");
   const lookup = {
     storm: "storm",
     stormy: "storm",
