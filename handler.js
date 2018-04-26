@@ -89,14 +89,6 @@ module.exports.evaluateInput = (event, context, callback) => {
       break;
   }
 
-  // if (slotDetails.mainCharacter.resolutions.length) {
-  //   fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
-  // } else if (slotDetails.weather.resolutions.length) {
-  //   sendWeatherToDatabase(docRef, event.inputTranscript);
-  // } else if (slotDetails.location.resolutions.length) {
-  //   fetchLocationAndSendImage(docRef, event.inputTranscript);
-  // }
-
   callback(null, response);
 };
 
@@ -204,6 +196,7 @@ function sendWeatherToDatabase(docRef, text) {
     blowing: "wind",
     rain: "rain",
     rainy: "rain",
+    raining: "rain",
     drizzle: "rain",
     drizzly: "rain",
     showers: "rain",
