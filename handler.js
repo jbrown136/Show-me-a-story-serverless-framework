@@ -40,7 +40,7 @@ module.exports.endIntent = (event, context, callback) => {
       fulfillmentState: "Fulfilled",
       message: {
         contentType: "PlainText",
-        content: "BYE"
+        content: "OK, let's start the story!"
       }
     }
   };
@@ -214,8 +214,7 @@ function sendWeatherToDatabase(docRef, text) {
     snowy: "snow",
     winter: "snow",
     wintery: "snow",
-    sleet: "snow",
-    pouring: "pouring"
+    sleet: "snow"
   };
   const weather = lookup[text] ? lookup[text] : "";
   const setWeather = docRef.update({ weather });
