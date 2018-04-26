@@ -27,12 +27,10 @@ const db = admin.firestore();
 module.exports.endIntent = (event, context, callback) => {
   console.log(event);
   const { name } = event.currentIntent;
-  // const { add, prop } = event.currentIntent.slots;
+  const docRef = db.collection("session").doc(event.userId);
   if (name === "AddCharacter") {
-    const docRef = db.collection("session").doc(event.userId);
     fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
   } else if (name === "AddProp") {
-    const docRef = db.collection("session").doc(event.userId);
     fetchPropAndSendImage(event, docRef, event.inputTranscript);
   }
 
@@ -93,13 +91,12 @@ module.exports.evaluateInput = (event, context, callback) => {
 };
 
 function fetchPropAndSendImage(event, docRef, text) {
-  console.log(text);
+  console.log({ text });
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
     .then(imgObj => {
-      const nameKey = event.currentIntent.slots.prop;
       const newProp = imgObj.items[0].link;
       db.runTransaction(t => {
         return t.get(docRef).then(doc => {
