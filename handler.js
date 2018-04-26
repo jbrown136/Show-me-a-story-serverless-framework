@@ -214,6 +214,7 @@ function sendWeatherToDatabase(docRef, text) {
     sandstorms: "sandstorm",
     sandstormy: "sandstorm",
     snow: "snow",
+    snowing: "snow",
     snowy: "snow",
     winter: "snow",
     wintery: "snow"
