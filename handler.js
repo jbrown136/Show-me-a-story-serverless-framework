@@ -209,7 +209,6 @@ function sendWeatherToDatabase(docRef, text) {
     dull: "cloud",
     grey: "cloud",
     rainbow: "rainbow",
-    sleet: "sleet",
     sandstorm: "sandstorm",
     sandstorms: "sandstorm",
     sandstormy: "sandstorm",
@@ -217,7 +216,8 @@ function sendWeatherToDatabase(docRef, text) {
     snowing: "snow",
     snowy: "snow",
     winter: "snow",
-    wintery: "snow"
+    wintery: "snow",
+    sleet: "snow"
   };
   const weather = lookup[text] ? lookup[text] : "";
   const setWeather = docRef.update({ weather });
