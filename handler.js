@@ -25,12 +25,13 @@ admin.initializeApp({
 const db = admin.firestore();
 
 module.exports.endIntent = (event, context, callback) => {
-  console.log(event.userId);
-  const { add, prop } = event.currentIntent.slots;
-  if (add === "character") {
+  console.log(event);
+  const { name } = event.currentIntent;
+  // const { add, prop } = event.currentIntent.slots;
+  if (name === "AddCharacter") {
     const docRef = db.collection("session").doc(event.userId);
     fetchCharacterAndSendImage(event, docRef, event.inputTranscript);
-  } else if (add === "prop") {
+  } else if (name === "AddProp") {
     const docRef = db.collection("session").doc(event.userId);
     fetchPropAndSendImage(event, docRef, event.inputTranscript);
   }
@@ -49,7 +50,7 @@ module.exports.endIntent = (event, context, callback) => {
 };
 
 module.exports.evaluateInput = (event, context, callback) => {
-  console.log(event.userId);
+  console.log(event);
   const { slots } = event.currentIntent;
   const response = {
     sessionAttributes: event.sessionAttributes,
@@ -100,19 +101,19 @@ module.exports.evaluateInput = (event, context, callback) => {
 };
 
 function fetchPropAndSendImage(event, docRef, text) {
-  console.log("fetch prop called");
+  console.log(text);
   return fetch(
     `https://www.googleapis.com/customsearch/v1?key=${imageKey}&cx=${customSearchURL}&q=${text} transparent&num=1&imgSize=xlarge&searchType=image&safe=high&rights=cc_publicdomain`
   )
     .then(res => res.json())
     .then(imgObj => {
       const nameKey = event.currentIntent.slots.prop;
-      const newProp = {};
-      newProp[nameKey] = imgObj.items[0].link;
+      const newProp = imgObj.items[0].link;
       db.runTransaction(t => {
         return t.get(docRef).then(doc => {
-          const oldProps = doc.data().things;
-          const updatedProps = { ...oldProps, ...newProp };
+          let oldProps = doc.data().things;
+          if (!oldProps) oldProps = [];
+          const updatedProps = [...oldProps, newProp];
           t.update(docRef, { things: updatedProps });
         });
       });
@@ -142,13 +143,12 @@ function fetchCharacterAndSendImage(event, docRef, text) {
   )
     .then(res => res.json())
     .then(imgObj => {
-      const nameKey = event.currentIntent.slots.mainCharacterName;
-      const newCharacter = {};
-      newCharacter[nameKey] = imgObj.items[0].link;
+      const newCharacter = imgObj.items[0].link;
       db.runTransaction(t => {
         return t.get(docRef).then(doc => {
-          const oldCharacters = doc.data().characters;
-          const updatedCharacters = { ...oldCharacters, ...newCharacter };
+          let oldCharacters = doc.data().characters;
+          if (!oldCharacters) oldCharacters = [];
+          const updatedCharacters = [...oldCharacters, newCharacter];
           t.update(docRef, { characters: updatedCharacters });
         });
       });
